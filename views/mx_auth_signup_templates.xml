@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <template
+        id="mx_auth_signup.signup"
+        inherit_id="auth_signup.fields"
+        name="Fields Invoicing MX">
+
+      <xpath expr="//div[contains(@class, 'field-confirm_password')]" position="after">
+        
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" name="generate_invoice" id="generate_invoice"/>
+            Generar Factura
+            </label>
+        </div>
+
+        <t t-call="mx_auth_signup.signup_billing" />
+
+      </xpath>
+
+    </template>
+
+    <template id="mx_auth_signup.signup_billing">
+      <h3 class="page-header mt16">Informacion de Facturacion</h3>
+
+      <div class="row">
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label label-optional" for="vat">RFC</label>
+          <input type="text" name="vat" class="form-control" t-att-value="billing_data.get('vat')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="phone">Telefono</label>
+          <input type="tel" name="phone" class="form-control" t-att-value="billing_data.get('phone')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="street">Calle</label>
+          <input type="text" name="street" class="form-control" t-att-value="billing_data.get('street')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="l10n_mx_street3">No. External</label>
+          <input type="text" name="l10n_mx_street3" class="form-control" t-att-value="billing_data.get('l10n_mx_street3')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="l10n_mx_street4">No. Internal</label>
+          <input type="text" name="l10n_mx_street4" class="form-control" t-att-value="billing_data.get('l10n_mx_street4')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="street2">Colonia</label>
+          <input type="text" name="street2" class="form-control" t-att-value="billing_data.get('street2')"/>
+        </div>
+
+        <div class="clearfix"/>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="city">Ciudad</label>
+          <input type="text" name="city" class="form-control" t-att-value="billing_data.get('city')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="zip_sat_id">Codigo Postal</label>
+          <select name="zip_sat_id" class="form-control">
+            <option value="">Codigo Postal...</option>
+            <t t-foreach="zip_codes or []" t-as="zip">
+              <option t-att-value="zip.id" t-att-selected="zip.id == billing_data.get(zip_id')">
+                [<t t-esc="zip.code"/>] <t t-esc="zip.state_sat_code"/>
+              </option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="country_id">Pais</label>
+          <select name="country_id" class="form-control">
+            <option value="">Pais...</option>
+            <t t-foreach="countries or []" t-as="country">
+              <option t-att-value="country.id" t-att-selected="country.id == billing_data.get('country_id')"><t t-esc="country.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label label-optional" for="state_id">Estado</label>
+          <select name="state_id" class="form-control">
+            <option value="">Seleccione...</option>
+            <t t-foreach="states" t-as="state">
+              <option t-att-value="state.id" t-att-data-country_id="state.country_id.id" t-att-selected="state.id == billing_data.get('state_id')"><t t-esc="state.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+        <label class="control-label" for="township_sat_id">Municipio</label>
+          <select name="township_sat_id" class="form-control">
+            <option value="">Municipio...</option>
+            <t t-foreach="townships or []" t-as="township">
+              <option t-att-value="thownship.id" t-att-selected="thownship.id == billing_data.get('township_id')"><t t-esc="township.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+        <label class="control-label" for="locality_sat_id">Localidad</label>
+          <select name="locality_sat_id" class="form-control">
+            <option value="">Localidad...</option>
+            <t t-foreach="localities or []" t-as="locality">
+              <option t-att-value="locality.id" t-att-selected="locality.id == billing_data.get('locality_id')"><t t-esc="locality.name"/></option>
+            </t>
+          </select>
+        </div>
+              
+      </div>
+
+
+      <div class="clearfix"/>
+        
+
+      <div class="row mb16" >
+        <h3 class="page-header mt16">Informacion de Entrega</h3>
+        
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_name">Nombre</label>
+          <input type="text" name="shipping_name" class="form-control" t-att-value="billing_data.get('shipping_name', '')" />
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_phone">Telefono</label>
+          <input type="tel" name="shipping_phone" class="form-control" t-att-value="billing_data.get('shipping_phone', '')" />
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_street">Calle</label>
+          <input type="text" name="shipping_street" class="form-control" t-att-value="billing_data.get('shipping_street', '')" />
+        </div>
+
+        <div class="clearfix"/>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_city">Ciudad</label>
+          <input type="text" name="shipping_city" class="form-control" t-att-value="billing_data.get('shipping_city', '')" />
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_zip_sat_id">Codigo Postal</label>
+          <select name="shipping_zip_sat_id" class="form-control">
+            <option value="">Codigo Postal...</option>
+            <t t-foreach="zip_codes or []" t-as="zip">
+              <option t-att-value="zip.id" t-att-selected="zip.id == billing_data.get('zip_id')">
+                [<t t-esc="zip.code"/>] <t t-esc="zip.state_sat_code"/>
+              </option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_country_id">Pais</label>
+          <select name="shipping_country_id" class="form-control" >
+            <option value="">Country...</option>
+            <t t-foreach="countries or []" t-as="country">
+              <option t-att-value="country.id" t-att-selected="country.id == billing_data.get('country_id')"><t t-esc="country.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label label-optional" for="shipping_state_id">Estado</label>
+          <select name="shipping_state_id" class="form-control" >
+            <option value="">State / Province...</option>
+            <t t-foreach="states or []" t-as="state">
+              <option t-att-value="state.id" t-att-data-country_id="state.country_id.id" t-att-selected="state.id == billing_data.get('shipping_state_id')"><t t-esc="state.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_township_sat_id">Municipio</label>
+          <select name="shipping_township_sat_id" class="form-control">
+            <option value="">Municipio...</option>
+            <t t-foreach="townships or []" t-as="township">
+              <option t-att-value="thownship.id" t-att-selected="thownship.id == billing_data.get('township_id')"><t t-esc="township.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+        <label class="control-label" for="shipping_locality_sat_id">Localidad</label>
+          <select name="shipping_locality_sat_id" class="form-control">
+            <option value="">Localidad...</option>
+            <t t-foreach="localities or []" t-as="locality">
+              <option t-att-value="locality.id" t-att-selected="locality.id == billing_data.get('locality_id')"><t t-esc="locality.name"/></option>
+            </t>
+          </select>
+        </div>
+
+      </div>
+
+    </template>
+
+  </data>
+</openerp>
