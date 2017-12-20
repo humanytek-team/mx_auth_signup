@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <template
+        id="mx_auth_signup.signup"
+        inherit_id="auth_signup.fields"
+        name="Fields Invoicing MX">
+
+      <xpath expr="//div[contains(@class, 'field-confirm_password')]" position="after">
+        
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" name="generate_invoice" id="generate_invoice" t-attf-value="{{'on' if billing_data.get('generate_invoice') == 'on' else ''}}"/>
+            Generar Factura
+            </label>
+        </div>
+
+        <t t-call="mx_auth_signup.signup_billing" />
+
+	<script type="text/javascript">
+	if ($("#generate_invoice").attr('value') == "on"){                                              
+	$("#generate_invoice").prop("checked", "checked");
+	$("#collapseOne").collapse("show");
+	}                                                                                               	</script>
+
+      </xpath>
+
+    </template>
+
+    <template id="mx_auth_signup.signup_billing">
+
+      <div id="accordion" role="tablist">
+	<div class="card">
+	  <div class="card-header" role="tab" id="headingOne">
+	    <h5 class="mb-0">
+	      <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+		Informacion de Facturacion
+	      </a>
+	    </h5>
+	  </div>
+	  
+	  <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+	    <div class="card-body">
+
+      <div class="row">
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="vat">RFC</label>
+          <input type="text" name="vat" class="form-control" t-att-value="billing_data.get('vat')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="phone">Telefono</label>
+          <input type="tel" name="phone" class="form-control" t-att-value="billing_data.get('phone')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="street">Calle</label>
+          <input type="text" name="street" class="form-control" t-att-value="billing_data.get('street')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="l10n_mx_street3">No. External</label>
+          <input type="text" name="l10n_mx_street3" class="form-control" t-att-value="billing_data.get('l10n_mx_street3')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="l10n_mx_street4">No. Internal</label>
+          <input type="text" name="l10n_mx_street4" class="form-control" t-att-value="billing_data.get('l10n_mx_street4')"/>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="street2">Colonia</label>
+          <input type="text" name="street2" class="form-control" t-att-value="billing_data.get('street2')"/>
+        </div>
+
+        <div class="clearfix"/>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="city">Ciudad</label>
+          <input type="text" name="city" class="form-control" t-att-value="billing_data.get('city')"/>
+        </div>
+
+	<div class="form-group col-lg-6">
+	  <label class="control-label" for="zip_sat_id">Codigo Postal</label>
+	  <input type="text"
+		 class="js_website_autocomplete"
+		 data-query-field="code"
+		 data-display-field="code"
+		 data-value-field="id"
+		 data-limit="10"
+		 data-model="res.country.zip.sat.code"
+		 name="zip_sat_id"
+		 id="zip_sat_id"
+		 t-att-value="billing_data.get('zip_sat_id')"
+		 />
+	</div>
+	
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="country_id">Pais</label>
+          <select name="country_id" class="form-control">
+            <option value="">Pais...</option>
+            <t t-foreach="countries or []" t-as="country">
+              <option t-att-value="country.id" t-att-selected="country.id == billing_data.get('country_id')"><t t-esc="country.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="state_id">Estado</label>
+          <select name="state_id" class="form-control">
+            <option value="">Seleccione...</option>
+            <t t-foreach="states" t-as="state">
+              <option t-att-value="state.id" t-att-data-country_id="state.country_id.id" t-att-selected="state.id == billing_data.get('state_id')"><t t-esc="state.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="township_sat_id">Municipio</label>
+          <select name="township_sat_id" class="form-control">
+            <option value="">Municipio...</option>
+            <t t-foreach="townships or []" t-as="township">
+              <option t-att-value="township.id" t-att-selected="township.id == billing_data.get('township_sat_id')"><t t-esc="township.name"/></option>
+            </t>
+          </select>
+        </div>
+
+	<div t-attf-class="form-group col-lg-6">
+	  <label class="control-label" for="locality_sat_id">Localidad</label>
+	  <select name="locality_sat_id" class="form-control">
+	    <option value="">Localidad...</option>
+	    <t t-foreach="localities or []" t-as="locality">
+	      <option t-att-value="locality.id" t-att-selected="locality.id == billing_data.get('locality_sat_id')"><t t-esc="locality.name"/></option>
+	    </t>
+	  </select>
+	</div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+      <div class="card">
+	<div class="card-header" role="tab" id="headingTwo">
+	  <h5 class="mb-0">
+	    <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+
+	      Informacion de Entrega
+
+	    </a>
+	  </h5>
+	</div>
+	<div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+	        <div class="card-body">
+
+      <div class="row mb16" >
+        
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_name">Nombre</label>
+          <input type="text" name="shipping_name" class="form-control" t-att-value="billing_data.get('shipping_name', '')" />
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_phone">Telefono</label>
+          <input type="tel" name="shipping_phone" class="form-control" t-att-value="billing_data.get('shipping_phone', '')" />
+        </div>
+
+        <div t-attf-class="form-group col-lg-12">
+          <label class="control-label" for="shipping_street">Calle</label>
+          <input type="text" name="shipping_street" class="form-control" t-att-value="billing_data.get('shipping_street', '')" />
+        </div>
+
+        <div class="clearfix"/>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_city">Ciudad</label>
+          <input type="text" name="shipping_city" class="form-control" t-att-value="billing_data.get('shipping_city', '')" />
+        </div>
+
+	<div class="form-group col-lg-6">
+	  <label class="control-label" for="shipping_zip_sat_id">Codigo Postal</label>
+	  <input type="text"
+		 class="js_website_autocomplete"
+		 data-query-field="code"
+		 data-display-field="code"
+		 data-value-field="id"
+		 data-limit="10"
+		 data-model="res.country.zip.sat.code"
+		 name="shipping_zip_sat_id"
+		 id="shipping_zip_sat_id"
+		 t-att-value="billing_data.get('shipping_zip_sat_id')"
+		 />
+	</div>
+	
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_country_id">Pais</label>
+          <select name="shipping_country_id" class="form-control" >
+            <option value="">Country...</option>
+            <t t-foreach="countries or []" t-as="country">
+              <option t-att-value="country.id" t-att-selected="country.id == billing_data.get('country_id')"><t t-esc="country.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_state_id">Estado</label>
+          <select name="shipping_state_id" class="form-control" >
+            <option value="">State / Province...</option>
+            <t t-foreach="states or []" t-as="state">
+              <option t-att-value="state.id" t-att-data-country_id="state.country_id.id" t-att-selected="state.id == billing_data.get('shipping_state_id')"><t t-esc="state.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_township_sat_id">Municipio</label>
+          <select name="shipping_township_sat_id" class="form-control">
+            <option value="">Municipio...</option>
+            <t t-foreach="townships or []" t-as="township">
+              <option t-att-value="township.id" t-att-selected="township.id == billing_data.get('township_sat_id')"><t t-esc="township.name"/></option>
+            </t>
+          </select>
+        </div>
+
+        <div t-attf-class="form-group col-lg-6">
+        <label class="control-label" for="shipping_locality_sat_id">Localidad</label>
+          <select name="shipping_locality_sat_id" class="form-control">
+            <option value="">Localidad...</option>
+            <t t-foreach="localities or []" t-as="locality">
+              <option t-att-value="locality.id" t-att-selected="locality.id == billing_data.get('locality_sat_id')"><t t-esc="locality.name"/></option>
+            </t>
+          </select>
+        </div>
+
+      </div>
+
+		</div>
+	</div>
+      </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+      $("#generate_invoice").on("click", function(){                                                                
+      if ($(this).prop("checked")){                                                                       
+      $("#collapseOne").collapse("show");                                                                 
+      }                                                                                                 
+      else{                                                                                             
+      $("#collapseOne").collapse("hide");
+      }                                                                                                 
+      })                                                                                                
+      </script>
+
+    </template>
+
+  </data>
+</openerp>
