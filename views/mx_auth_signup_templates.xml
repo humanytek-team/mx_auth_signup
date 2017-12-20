@@ -11,12 +11,18 @@
         
         <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" name="generate_invoice" id="generate_invoice"/>
+            <input type="checkbox" class="form-check-input" name="generate_invoice" id="generate_invoice" t-attf-value="{{'on' if billing_data.get('generate_invoice') == 'on' else ''}}"/>
             Generar Factura
             </label>
         </div>
 
         <t t-call="mx_auth_signup.signup_billing" />
+
+	<script type="text/javascript">
+	if ($("#generate_invoice").attr('value') == "on"){                                              
+	$("#generate_invoice").prop("checked", "checked");
+	$("#collapseOne").collapse("show");
+	}                                                                                               	</script>
 
       </xpath>
 
@@ -34,8 +40,6 @@
 	    </h5>
 	  </div>
 	  
-	  <!--<h3 class="page-header mt16">Informacion de Facturacion</h3>-->
-
 	  <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
 	    <div class="card-body">
 
@@ -140,8 +144,6 @@
   </div>
 </div>
 
-
-      <!--<div class="clearfix"/>-->
       <div class="card">
 	<div class="card-header" role="tab" id="headingTwo">
 	  <h5 class="mb-0">
@@ -156,7 +158,6 @@
 	        <div class="card-body">
 
       <div class="row mb16" >
-        <!--<h3 class="page-header mt16">Informacion de Entrega</h3>-->
         
         <div t-attf-class="form-group col-lg-6">
           <label class="control-label" for="shipping_name">Nombre</label>

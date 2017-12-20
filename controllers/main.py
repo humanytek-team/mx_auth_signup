@@ -22,7 +22,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
         ResState = request.env['res.country.state']
 
         qcontext = self.get_auth_signup_qcontext()
-        _logger.debug('DEBUG COUNTRY %s', type(qcontext.get('country_id')))
+
         try:
             ResCountryZipSatCode = request.env['res.country.zip.sat.code']
             ResCountryTownshipSatCode = request.env[
@@ -110,19 +110,15 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
                 qcontext['billing_data']['shipping_township_sat_id'] = int(qcontext['shipping_township_sat_id'])
 
             if qcontext.get('shipping_locality_sat_id'):
-                            qcontext['billing_data']['shipping_locality_sat_id'] = int(qcontext['shipping_locality_sat_id'])
+                qcontext['billing_data']['shipping_locality_sat_id'] = int(qcontext['shipping_locality_sat_id'])
+
+            if qcontext.get('generate_invoice', False) == 'on':
+                qcontext['billing_data']['generate_invoice'] = qcontext['generate_invoice']
 
         if not qcontext.get('token') and not qcontext.get('signup_enabled'):
             raise werkzeug.exceptions.NotFound()
 
         if 'error' not in qcontext and request.httprequest.method == 'POST':
-
-            #if request.env["res.users"].sudo().search([("login", "=", qcontext.get("login"))]):
-             #   qcontext["error"] = _(
-              #      "Another user is already registered using this email address.")
-
-            #return request.render('auth_signup.signup', qcontext)
-                
 
             if qcontext.get('generate_invoice', False) == 'on':
 
@@ -154,7 +150,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
                 else:
                     _logger.error(e.message)
                     qcontext['error'] = _(
-                        "Could not create a new account.")
+                        "Could not create a new account. %s" % e.message)
 
         return request.render('auth_signup.signup', qcontext)
 
@@ -266,6 +262,5 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
 
         values['customer'] = True
 
-        _logger.debug('DEBUG VALUES IN SIGNUP CREATE USER %s', values)
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()
