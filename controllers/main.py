@@ -22,7 +22,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
         ResState = request.env['res.country.state']
 
         qcontext = self.get_auth_signup_qcontext()
-
+        _logger.debug('DEBUG COUNTRY %s', type(qcontext.get('country_id')))
         try:
             ResCountryZipSatCode = request.env['res.country.zip.sat.code']
             ResCountryTownshipSatCode = request.env[
@@ -31,19 +31,98 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
                 'res.country.locality.sat.code']
 
             qcontext.update({
-                'zip_codes': ResCountryZipSatCode.search([]),
-                'thownships': ResCountryTownshipSatCode.search([]),
-                'localities': ResCountryLocalitySatCode.search([]),
+                'townships': ResCountryTownshipSatCode.sudo().search([]),
+                'localities': ResCountryLocalitySatCode.sudo().search([]),
             })
 
         except Exception:
             pass
 
+        qcontext.update({'countries': ResCountry.search([])})
+        qcontext.update({'states': ResState.search([])})
+
+        if not qcontext.get('billing_data', False):
+
+            qcontext['billing_data'] = dict()
+
+            mx = ResCountry.search([('code', '=', 'MX')])
+            if mx:
+                qcontext['billing_data']['country_id'] = mx[0].id
+
+            if qcontext.get('vat'):
+                qcontext['billing_data']['vat'] = qcontext['vat']
+
+            if qcontext.get('phone'):
+                qcontext['billing_data']['phone'] = qcontext['phone']
+
+            if qcontext.get('street'):
+                qcontext['billing_data']['street'] = qcontext['street']
+
+            if qcontext.get('l10n_mx_street3'):
+                qcontext['billing_data']['l10n_mx_street3'] = qcontext['l10n_mx_street3']
+
+            if qcontext.get('l10n_mx_street4'):
+                qcontext['billing_data']['l10n_mx_street4'] = qcontext['l10n_mx_street4']
+
+            if qcontext.get('street2'):
+                qcontext['billing_data']['street2'] = qcontext['street2']
+
+            if qcontext.get('city'):
+                qcontext['billing_data']['city'] = qcontext['city']
+
+            if qcontext.get('zip_sat_id'):
+                qcontext['billing_data']['zip_sat_id'] = qcontext['zip_sat_id']
+
+            if qcontext.get('country_id'):
+                qcontext['billing_data']['country_id'] = int(qcontext['country_id'])
+
+            if qcontext.get('state_id'):
+                qcontext['billing_data']['state_id'] = int(qcontext['state_id'])
+
+            if qcontext.get('township_sat_id'):
+                qcontext['billing_data']['township_sat_id'] = int(qcontext['township_sat_id'])
+
+            if qcontext.get('locality_sat_id'):
+                qcontext['billing_data']['locality_sat_id'] = int(qcontext['locality_sat_id'])
+
+            if qcontext.get('shipping_name'):
+                qcontext['billing_data']['shipping_name'] = qcontext['shipping_name']
+
+            if qcontext.get('shipping_phone'):
+                qcontext['billing_data']['shipping_phone'] = qcontext['shipping_phone']
+
+            if qcontext.get('shipping_street'):
+                qcontext['billing_data']['shipping_street'] = qcontext['shipping_street']
+
+            if qcontext.get('shipping_city'):
+                qcontext['billing_data']['shipping_city'] = qcontext['shipping_city']
+
+            if qcontext.get('shipping_zip_sat_id'):
+                qcontext['billing_data']['shipping_zip_sat_id'] = qcontext['shipping_zip_sat_id']
+
+            if qcontext.get('shipping_country_id'):
+                qcontext['billing_data']['shipping_country_id'] = int(qcontext['shipping_country_id'])
+
+            if qcontext.get('shipping_state_id'):
+                qcontext['billing_data']['shipping_state_id'] = int(qcontext['shipping_state_id'])
+
+            if qcontext.get('shipping_thownship_sat_id'):
+                qcontext['billing_data']['shipping_township_sat_id'] = int(qcontext['shipping_township_sat_id'])
+
+            if qcontext.get('shipping_locality_sat_id'):
+                            qcontext['billing_data']['shipping_locality_sat_id'] = int(qcontext['shipping_locality_sat_id'])
+
         if not qcontext.get('token') and not qcontext.get('signup_enabled'):
             raise werkzeug.exceptions.NotFound()
 
         if 'error' not in qcontext and request.httprequest.method == 'POST':
-            _logger.debug('DEBUG QCONTEXT POST %s', qcontext)
+
+            #if request.env["res.users"].sudo().search([("login", "=", qcontext.get("login"))]):
+             #   qcontext["error"] = _(
+              #      "Another user is already registered using this email address.")
+
+            #return request.render('auth_signup.signup', qcontext)
+                
 
             if qcontext.get('generate_invoice', False) == 'on':
 
@@ -76,18 +155,6 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
                     _logger.error(e.message)
                     qcontext['error'] = _(
                         "Could not create a new account.")
-
-        if request.httprequest.method != 'POST':
-            billing_data = dict()
-            qcontext['billing_data'] = billing_data
-
-            mx = ResCountry.search([('code', '=', 'MX')])
-            if mx:
-                billing_data['country_id'] = mx[0].id
-
-            qcontext.update({'countries': ResCountry.search([])})
-
-            qcontext.update({'states': ResState.search([])})
 
         return request.render('auth_signup.signup', qcontext)
 
@@ -179,7 +246,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
 
             if qcontext.get('shipping_township_sat_id', False):
                 shipping_info[
-                    'thownship_sat_id'] = qcontext['shipping_township_sat_id']
+                    'township_sat_id'] = qcontext['shipping_township_sat_id']
 
             if qcontext.get('shipping_locality_sat_id', False):
                 shipping_info['locality_sat_id'] = qcontext[
