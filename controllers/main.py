@@ -106,7 +106,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
             if qcontext.get('shipping_state_id'):
                 qcontext['billing_data']['shipping_state_id'] = int(qcontext['shipping_state_id'])
 
-            if qcontext.get('shipping_thownship_sat_id'):
+            if qcontext.get('shipping_township_sat_id'):
                 qcontext['billing_data']['shipping_township_sat_id'] = int(qcontext['shipping_township_sat_id'])
 
             if qcontext.get('shipping_locality_sat_id'):
