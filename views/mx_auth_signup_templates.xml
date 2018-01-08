@@ -83,17 +83,11 @@
         </div>
 
 	<div class="form-group col-lg-6">
-	  <label class="control-label" for="zip_sat_id">Codigo Postal</label>
+	  <label class="control-label" for="zip_code">Codigo Postal</label>
 	  <input type="text"
-		 class="js_website_autocomplete"
-		 data-query-field="code"
-		 data-display-field="code"
-		 data-value-field="id"
-		 data-limit="10"
-		 data-model="res.country.zip.sat.code"
-		 name="zip_sat_id"
-		 id="zip_sat_id"
-		 t-att-value="billing_data.get('zip_sat_id')"
+		 class="form-control"
+		 name="zip_code"
+		 t-att-value="billing_data.get('zip_code')"
 		 />
 	</div>
 	
@@ -169,9 +163,14 @@
           <input type="tel" name="shipping_phone" class="form-control" t-att-value="billing_data.get('shipping_phone', '')" />
         </div>
 
-        <div t-attf-class="form-group col-lg-12">
+        <div t-attf-class="form-group col-lg-6">
           <label class="control-label" for="shipping_street">Calle</label>
           <input type="text" name="shipping_street" class="form-control" t-att-value="billing_data.get('shipping_street', '')" />
+        </div>
+
+	<div t-attf-class="form-group col-lg-6">
+          <label class="control-label" for="shipping_street2">Colonia</label>
+          <input type="text" name="shipping_street2" class="form-control" t-att-value="billing_data.get('shipping_street2')"/>
         </div>
 
         <div class="clearfix"/>
@@ -182,17 +181,11 @@
         </div>
 
 	<div class="form-group col-lg-6">
-	  <label class="control-label" for="shipping_zip_sat_id">Codigo Postal</label>
+	  <label class="control-label" for="shipping_zip_code">Codigo Postal</label>
 	  <input type="text"
-		 class="js_website_autocomplete"
-		 data-query-field="code"
-		 data-display-field="code"
-		 data-value-field="id"
-		 data-limit="10"
-		 data-model="res.country.zip.sat.code"
-		 name="shipping_zip_sat_id"
-		 id="shipping_zip_sat_id"
-		 t-att-value="billing_data.get('shipping_zip_sat_id')"
+		 class="form-control"
+		 name="shipping_zip_code"
+		 t-att-value="billing_data.get('shipping_zip_code')"
 		 />
 	</div>
 	
