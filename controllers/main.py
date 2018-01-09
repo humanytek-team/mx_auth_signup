@@ -152,7 +152,9 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
 
             if qcontext.get('generate_invoice', False) == 'on':
 
-                vat = qcontext.get('vat', False)            
+                vat = qcontext.get('vat', False)
+                if vat and vat[:2] != 'MX':
+                    vat = 'MX' + vat
 
                 if not vat:
                     qcontext['error'] = _('Debe indicar su RFC')
@@ -208,7 +210,10 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
         elif qcontext.get('generate_invoice') == 'on' and not qcontext.get('partner_exists', False):
 
             if qcontext.get('vat', False):
-                values['vat'] = qcontext['vat']
+                if qcontext['vat'][:2] != 'MX':
+                    values['vat'] = 'MX' + qcontext['vat']
+                else:
+                    values['vat'] = qcontext['vat']
 
             if qcontext.get('phone', False):
                 values['phone'] = qcontext['phone']
