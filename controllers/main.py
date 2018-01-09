@@ -48,6 +48,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
             mx = ResCountry.search([('code', '=', 'MX')])
             if mx:
                 qcontext['billing_data']['country_id'] = mx[0].id
+                qcontext['billing_data']['shipping_country_id'] = mx[0].id
 
             if qcontext.get('vat'):
                 qcontext['billing_data']['vat'] = qcontext['vat']
@@ -70,8 +71,8 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
             if qcontext.get('city'):
                 qcontext['billing_data']['city'] = qcontext['city']
 
-            if qcontext.get('zip_sat_id'):
-                qcontext['billing_data']['zip_sat_id'] = qcontext['zip_sat_id']
+            if qcontext.get('zip_code'):
+                qcontext['billing_data']['zip_code'] = qcontext['zip_code']
 
             if qcontext.get('country_id'):
                 qcontext['billing_data']['country_id'] = int(qcontext['country_id'])
@@ -94,11 +95,14 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
             if qcontext.get('shipping_street'):
                 qcontext['billing_data']['shipping_street'] = qcontext['shipping_street']
 
+            if qcontext.get('shipping_street2'):
+                qcontext['billing_data']['shipping_street2'] = qcontext['shipping_street2']
+
             if qcontext.get('shipping_city'):
                 qcontext['billing_data']['shipping_city'] = qcontext['shipping_city']
 
-            if qcontext.get('shipping_zip_sat_id'):
-                qcontext['billing_data']['shipping_zip_sat_id'] = qcontext['shipping_zip_sat_id']
+            if qcontext.get('shipping_zip_code'):
+                qcontext['billing_data']['shipping_zip_code'] = qcontext['shipping_zip_code']
 
             if qcontext.get('shipping_country_id'):
                 qcontext['billing_data']['shipping_country_id'] = int(qcontext['shipping_country_id'])
@@ -106,7 +110,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
             if qcontext.get('shipping_state_id'):
                 qcontext['billing_data']['shipping_state_id'] = int(qcontext['shipping_state_id'])
 
-            if qcontext.get('shipping_thownship_sat_id'):
+            if qcontext.get('shipping_township_sat_id'):
                 qcontext['billing_data']['shipping_township_sat_id'] = int(qcontext['shipping_township_sat_id'])
 
             if qcontext.get('shipping_locality_sat_id'):
@@ -120,10 +124,37 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
 
         if 'error' not in qcontext and request.httprequest.method == 'POST':
 
+            zip_fields = {'zip_code': 'zip_sat_id', 'shipping_zip_code': 'shipping_zip_sat_id'}
+
+            for zip_field in zip_fields:
+                
+                if qcontext.get(zip_field, False):
+
+                    try:
+
+                        ResCountryZipSatCode = request.env['res.country.zip.sat.code']
+
+                        zip = ResCountryZipSatCode.search([
+                            ('code', '=', qcontext[zip_field]),
+                        ])
+
+                        if zip:
+
+                            qcontext[zip_fields[zip_field]] = zip[0].id
+
+                        else:
+
+                            qcontext['error'] = _('El codigo postal no es valido.')
+                            return request.render('auth_signup.signup', qcontext)
+
+                    except Exception:
+                        pass
+
             if qcontext.get('generate_invoice', False) == 'on':
 
                 vat = qcontext.get('vat', False)
-                zip_code = qcontext.get('zip_code', False)
+                if vat and vat[:2] != 'MX':
+                    vat = 'MX' + vat
 
                 if not vat:
                     qcontext['error'] = _('Debe indicar su RFC')
@@ -179,7 +210,10 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
         elif qcontext.get('generate_invoice') == 'on' and not qcontext.get('partner_exists', False):
 
             if qcontext.get('vat', False):
-                values['vat'] = qcontext['vat']
+                if qcontext['vat'][:2] != 'MX':
+                    values['vat'] = 'MX' + qcontext['vat']
+                else:
+                    values['vat'] = qcontext['vat']
 
             if qcontext.get('phone', False):
                 values['phone'] = qcontext['phone']
@@ -201,6 +235,7 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
 
             if qcontext.get('zip_sat_id', False):
                 values['zip_sat_id'] = qcontext['zip_sat_id']
+                values['zip'] = qcontext['zip_code']
 
             if qcontext.get('country_id', False):
                 values['country_id'] = qcontext['country_id']
@@ -225,12 +260,16 @@ class AuthSignupHome(openerp.addons.auth_signup.controllers.main.AuthSignupHome)
             if qcontext.get('shipping_street', False):
                 shipping_info['street'] = qcontext['shipping_street']
 
+            if qcontext.get('shipping_street2', False):
+                shipping_info['street2'] = qcontext['shipping_street2']
+
             if qcontext.get('shipping_city', False):
                 shipping_info['city'] = qcontext['shipping_city']
 
             if qcontext.get('shipping_zip_sat_id', False):
                 shipping_info['zip_sat_id'] = qcontext[
                     'shipping_zip_sat_id']
+                shipping_info['zip'] = qcontext['shipping_zip_code']
 
             if qcontext.get('shipping_country_id', False):
                 shipping_info['country_id'] = qcontext[
